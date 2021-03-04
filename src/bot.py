@@ -1,5 +1,7 @@
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
+from rlbot.utils.game_state_util import GameState, CarState, Rotator, Physics, Vector3
+import math
 
 from Snapshot.snap import Recorder
 from play_moment.moment import Moment
@@ -20,6 +22,7 @@ class MyBot(BaseAgent):
         self.snap_save = False
         self.replay_check = False
         self.is_ready_to_load = False
+        self.isbotout = False
 
     def initialize_agent(self):
         self.recorder = Recorder()
@@ -30,6 +33,16 @@ class MyBot(BaseAgent):
         This function will be called by the framework many times per second. This is where you can
         see the motion of the ball, etc. and return controls to drive your car.
         """
+        # if not self.isbotout:
+        #     for index, bot in enumerate(packet.game_cars):
+        #         if bot.is_bot:
+        #             bot_state = CarState(boost_amount=87,
+        #                                  physics=Physics(location=Vector3(x=100, y=100, z=), rotation=Rotator(math.pi / 2, 0, 0),
+        #                                                  angular_velocity=Vector3(0, 0, 0)))
+        #             initial_state = GameState(cars={index: bot_state})
+        #             self.set_game_state(initial_state)
+        #             self.isbotout = True
+
         if keyboard.is_pressed("r"):
             self.stop_time = 30
             self.start_record = True
@@ -61,7 +74,7 @@ class MyBot(BaseAgent):
             self.debug(self.renderer, recording)
 
         controls = SimpleControllerState()
-        controls.throttle = 1.0
+        controls.throttle = 1
 
         return controls
 
