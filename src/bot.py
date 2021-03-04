@@ -43,7 +43,7 @@ class MyBot(BaseAgent):
         #             self.set_game_state(initial_state)
         #             self.isbotout = True
 
-        if keyboard.is_pressed("r"):
+        if keyboard.is_pressed("/"):
             self.stop_time = 30
             self.start_record = True
             self.show_text = True
@@ -59,7 +59,7 @@ class MyBot(BaseAgent):
                 self.stop_time -= 1
                 time.sleep(1)
 
-        if keyboard.is_pressed("l"):
+        if keyboard.is_pressed("*"):
             self.replay_start = True
             self.moment.init_count()
         if self.replay_start:
