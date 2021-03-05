@@ -20,6 +20,14 @@ class Moment:
         self.found_save = False
         self.snap_count = 0
         self.car_index = None
+        self.set_playback_time = 10
+        with open("src/Snapshot/playback.json", "r") as pp:
+            playback_time = json.load(pp)["playback_time"]
+            if playback_time:
+                self.prev_time = playback_time
+            else:
+                self.prev_time = 10
+        self.prev_hold = False
 
     def init_count(self):
         with open("src/Snapshot/count.json", "r") as cc:
@@ -28,6 +36,16 @@ class Moment:
                 self.snap_count = count
             else:
                 self.snap_count = 0
+
+        with open("src/Snapshot/playback.json", "r") as pp:
+            playback_time = json.load(pp)["playback_time"]
+            if playback_time:
+                self.set_playback_time = playback_time
+            else:
+                self.set_playback_time = 10
+
+        if self.set_playback_time is not self.prev_time:
+            self.prev_hold = True
 
     def load_packet(self) -> bool:
         try:
@@ -74,13 +92,16 @@ class Moment:
     def check_for_score(self):
         for buffer in self.packet:
             for index in range(self.num_cars):
-                if buffer.game_cars[index].score_info.goals > self.current_goal:
+                if buffer.game_cars[index].score_info.goals > self.current_goal or self.prev_hold:
                     if not buffer.game_cars[index].is_bot:
                         self.current_goal = buffer.game_cars[index].score_info.goals
-                        self.found_time = buffer.game_info.seconds_elapsed
-                        self.starting_time = self.found_time - 3
+                        self.found_time = buffer.game_info.seconds_elapsed  # HEREEEEEEEEEEEE #############
+                        self.starting_time = self.found_time - self.set_playback_time
                         self.car_index = index
                         self.found_score = True
+                    if self.prev_hold:
+                        self.prev_time = self.set_playback_time
+                        self.prev_hold = False
 
     def check_for_save(self):
         if self.found_score:
@@ -91,6 +112,6 @@ class Moment:
                     if not buffer.game_cars[index].is_bot:
                         self.current_save = buffer.game_cars[index].score_info.saves
                         self.found_time = buffer.game_info.seconds_elapsed
-                        self.starting_time = self.found_time - 6
+                        self.starting_time = self.found_time - self.set_playback_time
                         self.car_index = index
                         self.found_save = True

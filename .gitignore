@@ -115,3 +115,5 @@ ENV/
 
 dumper/
 training_pack/
+count.json
+playback.json
