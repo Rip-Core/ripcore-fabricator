@@ -54,9 +54,17 @@ def setsnap():
         config.write(cfg)
 
 
+def setmode():
+    mode_set = str(mode_var.get())
+    config["SETTINGS"]["mode"] = mode_set
+    with open("src/config.ini", "w") as cfg:
+        config.write(cfg)
+
+
 if __name__ == "__main__":
     root = Tk()
-
+    mode_var = IntVar()
+    mode_var.set(0)
     root.geometry("300x300")
     root.title("RIP core")
     Label(root, text="RIP CORE", font=("Courier", 18)).pack()
@@ -73,6 +81,12 @@ if __name__ == "__main__":
     snap_entry.pack()
     set_snap = Button(root, text="SET SNAP",
                       command=setsnap).pack()
+    mode_label = Label(root, text="Select Mode", font=("Courier"))
+    mode_label.pack()
+    Radiobutton(root, text="BOTH", variable=mode_var,
+                value=0, command=setmode).pack()
+    Radiobutton(root, text="BALL", variable=mode_var,
+                value=1, command=setmode).pack()
     start_button = Button(root, text="START", bg="green",
                           fg="white", width=20, command=start).pack(side=BOTTOM)
     stop_button = Button(root, text="STOP", bg="red",

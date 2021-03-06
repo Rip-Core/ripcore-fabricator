@@ -17,6 +17,7 @@ class Moment:
         self.car_index = None
         self.set_playback_time = 10
         self.snap_end_time = None
+        self.mode = 0
 
     def init_count(self):
         try:
@@ -24,6 +25,7 @@ class Moment:
             config.read("src/config.ini")
             self.snap_count = int(config['SETTINGS']['set_custom_snap'])
             self.set_playback_time = int(config['SETTINGS']['playback_time'])
+            self.mode = int(config["SETTINGS"]["mode"])
         except Exception as e:
             print(e)
 
@@ -59,9 +61,12 @@ class Moment:
                 physics=self.car_state["physics"], boost_amount=self.car_state["boost_amount"])
             ball_state = BallState(physics=self.ball_state["physics"])
             game_info_state = GameInfoState(self.game_info_state)
-
-            game_state = GameState(ball=ball_state, cars={
-                0: car_state}, game_info=game_info_state)
+            if self.mode is 0:
+                game_state = GameState(ball=ball_state, cars={
+                    0: car_state}, game_info=game_info_state)
+            else:
+                game_state = GameState(
+                    ball=ball_state, game_info=game_info_state)
 
             with open(f"src/Snapshot/training_pack/test#{self.snap_count}.pack", "wb") as gs:
                 pickle.dump(game_state, gs)
