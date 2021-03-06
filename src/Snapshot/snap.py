@@ -1,16 +1,13 @@
 import pickle
 import copy
-import json
+import configparser
 
 
 class Recorder:
     def __init__(self):
-        with open("src/Snapshot/count.json", "r") as cc:
-            count = json.load(cc)["snap_count"]
-            if count:
-                self.snap_count = count
-            else:
-                self.snap_count = 0
+        self.config = configparser.ConfigParser()
+        self.config.read("src/config.ini")
+        self.snap_count = int(self.config["SETTINGS"]["snap_count"])
         self.buffer = []
 
     def store(self, packet):
@@ -18,8 +15,9 @@ class Recorder:
 
     def save(self):
         self.snap_count += 1
-        with open("src/Snapshot/count.json", "w") as cc:
-            json.dump({"snap_count": self.snap_count}, cc)
+        self.config["SETTINGS"]["snap_count"] = str(self.snap_count)
+        with open("src/config.ini", "w") as cfg:
+            self.config.write(cfg)
         print("Saving")
         fp = open(
             "src/Snapshot/dumper/snapshot#{}.pickle".format(self.snap_count), "wb")

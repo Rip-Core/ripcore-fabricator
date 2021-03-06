@@ -1,6 +1,6 @@
 from rlbot.utils.game_state_util import GameState, BallState, CarState, GameInfoState
 import pickle
-import json
+import configparser
 
 
 class Moment:
@@ -8,53 +8,33 @@ class Moment:
         self.packet = []
         self.num_cars = None
         self.starting_time = None
-        self.found_time = None
         self.starting_state = None
         self.game_state = None
         self.car_state = None
         self.ball_state = None
         self.game_info_state = None
-        self.current_goal = 0
-        self.current_save = 0
-        self.found_score = False
-        self.found_save = False
-        self.snap_count = 0
+        self.snap_count = 4
         self.car_index = None
         self.set_playback_time = 10
-        with open("src/Snapshot/playback.json", "r") as pp:
-            playback_time = json.load(pp)["playback_time"]
-            if playback_time:
-                self.prev_time = playback_time
-            else:
-                self.prev_time = 10
-        self.prev_hold = False
+        self.snap_end_time = None
 
     def init_count(self):
-        with open("src/Snapshot/count.json", "r") as cc:
-            count = json.load(cc)["snap_count"]
-            if count:
-                self.snap_count = count
-            else:
-                self.snap_count = 0
-
-        with open("src/Snapshot/playback.json", "r") as pp:
-            playback_time = json.load(pp)["playback_time"]
-            if playback_time:
-                self.set_playback_time = playback_time
-            else:
-                self.set_playback_time = 10
-
-        if self.set_playback_time is not self.prev_time:
-            self.prev_hold = True
+        try:
+            config = configparser.ConfigParser()
+            config.read("src/config.ini")
+            self.snap_count = int(config['SETTINGS']['set_custom_snap'])
+            self.set_playback_time = int(config['SETTINGS']['playback_time'])
+        except Exception as e:
+            print(e)
 
     def load_packet(self) -> bool:
         try:
             with open("src/Snapshot/dumper/snapshot#{}.pickle".format(self.snap_count), "rb") as fp:
                 self.packet = pickle.load(fp)
             self.num_cars = self.packet[len(self.packet) - 1].num_cars
-            self.check_for_score()
-            self.check_for_save()
-            if self.found_score or self.found_save:
+            self.snap_end_time = self.packet[0].game_info.seconds_elapsed
+            self.starting_time = self.snap_end_time + self.set_playback_time
+            if self.snap_end_time:
                 for key, buffer in enumerate(self.packet):
                     if round(buffer.game_info.seconds_elapsed) == round(self.starting_time):
                         self.starting_state = buffer
@@ -67,7 +47,7 @@ class Moment:
         try:
             self.game_state = GameState.create_from_gametickpacket(
                 self.starting_state)
-            self.car_state = self.game_state.cars[self.car_index].__dict__
+            self.car_state = self.game_state.cars[0].__dict__
             self.ball_state = self.game_state.ball.__dict__
             self.game_info_state = self.game_state.game_info
         except Exception as e:
@@ -81,37 +61,10 @@ class Moment:
             game_info_state = GameInfoState(self.game_info_state)
 
             game_state = GameState(ball=ball_state, cars={
-                self.car_index: car_state}, game_info=game_info_state)
+                0: car_state}, game_info=game_info_state)
 
             with open(f"src/Snapshot/training_pack/test#{self.snap_count}.pack", "wb") as gs:
                 pickle.dump(game_state, gs)
             return game_state
         except Exception as e:
             print(e)
-
-    def check_for_score(self):
-        for buffer in self.packet:
-            for index in range(self.num_cars):
-                if buffer.game_cars[index].score_info.goals > self.current_goal or self.prev_hold:
-                    if not buffer.game_cars[index].is_bot:
-                        self.current_goal = buffer.game_cars[index].score_info.goals
-                        self.found_time = buffer.game_info.seconds_elapsed  # HEREEEEEEEEEEEE #############
-                        self.starting_time = self.found_time - self.set_playback_time
-                        self.car_index = index
-                        self.found_score = True
-                    if self.prev_hold:
-                        self.prev_time = self.set_playback_time
-                        self.prev_hold = False
-
-    def check_for_save(self):
-        if self.found_score:
-            return
-        for buffer in self.packet:
-            for index in range(self.num_cars):
-                if buffer.game_cars[index].score_info.saves > self.current_save:
-                    if not buffer.game_cars[index].is_bot:
-                        self.current_save = buffer.game_cars[index].score_info.saves
-                        self.found_time = buffer.game_info.seconds_elapsed
-                        self.starting_time = self.found_time - self.set_playback_time
-                        self.car_index = index
-                        self.found_save = True

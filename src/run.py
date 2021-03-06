@@ -2,7 +2,12 @@ from tkinter import *
 import multiprocessing
 from rlbot.setup_manager import SetupManager
 import psutil
-import json
+import configparser
+from pathlib import Path
+import os
+
+config = configparser.ConfigParser()
+config.read("src/config.ini")
 
 
 def start_match():
@@ -36,9 +41,17 @@ def stop():
 
 
 def setbutton():
-    playback_time = int(time_entry.get())
-    with open("src/Snapshot/playback.json", "w") as pp:
-        json.dump({"playback_time": playback_time}, pp)
+    playback_time = time_entry.get()
+    config["SETTINGS"]["playback_time"] = playback_time
+    with open("src/config.ini", "w") as pp:
+        config.write(pp)
+
+
+def setsnap():
+    snap_set = snap_entry.get()
+    config["SETTINGS"]["set_custom_snap"] = snap_set
+    with open("src/config.ini", "w") as cfg:
+        config.write(cfg)
 
 
 if __name__ == "__main__":
@@ -46,17 +59,22 @@ if __name__ == "__main__":
 
     root.geometry("300x300")
     root.title("RIP core")
-
-    Label(root, text="Set PlayBack Time", font=("Courier", 18)).pack()
+    Label(root, text="RIP CORE", font=("Courier", 18)).pack()
+    time_label = Label(root, text="Set Playback Time", font=("Courier"))
+    time_label.pack()
     time_entry = Entry(root, width=30)
     time_entry.pack()
     set_button = Button(root, text="SET TIME",
                         command=setbutton).pack()
+    count_label = Label(root, text="Set Snap", font=("Courier"))
+    count_label.pack()
+    time_label.pack()
+    snap_entry = Entry(root, width=30)
+    snap_entry.pack()
+    set_snap = Button(root, text="SET SNAP",
+                      command=setsnap).pack()
     start_button = Button(root, text="START", bg="green",
                           fg="white", width=20, command=start).pack(side=BOTTOM)
-    # test = Button(root, text="test", bg="green",
-    #               fg="white", width=20, command=tes).pack(side=BOTTOM)
     stop_button = Button(root, text="STOP", bg="red",
                          fg="white", width=20, command=stop).pack(side=BOTTOM)
-
     root.mainloop()
