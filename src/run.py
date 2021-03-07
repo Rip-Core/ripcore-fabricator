@@ -3,8 +3,6 @@ import multiprocessing
 from rlbot.setup_manager import SetupManager
 import psutil
 import configparser
-from pathlib import Path
-import os
 
 config = configparser.ConfigParser()
 config.read("src/config.ini")
@@ -65,7 +63,7 @@ if __name__ == "__main__":
     root = Tk()
     mode_var = IntVar()
     mode_var.set(0)
-    root.geometry("300x300")
+    root.geometry("300x310")
     root.title("RIP core")
     Label(root, text="RIP CORE", font=("Courier", 18)).pack()
     time_label = Label(root, text="Set Playback Time", font=("Courier"))

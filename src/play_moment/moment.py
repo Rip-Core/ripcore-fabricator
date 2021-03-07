@@ -24,8 +24,8 @@ class Moment:
             config = configparser.ConfigParser()
             config.read("src/config.ini")
             self.snap_count = int(config['SETTINGS']['set_custom_snap'])
-            self.set_playback_time = int(config['SETTINGS']['playback_time'])
-            self.mode = int(config["SETTINGS"]["mode"])
+            self.set_playback_time = float(config['SETTINGS']['playback_time'])
+            self.mode = float(config["SETTINGS"]["mode"])
         except Exception as e:
             print(e)
 
@@ -38,7 +38,7 @@ class Moment:
             self.starting_time = self.snap_end_time + self.set_playback_time
             if self.snap_end_time:
                 for key, buffer in enumerate(self.packet):
-                    if round(buffer.game_info.seconds_elapsed) == round(self.starting_time):
+                    if float("%.1f" % buffer.game_info.seconds_elapsed) == float("%.1f" % self.starting_time):
                         self.starting_state = buffer
                 return True
             return False
@@ -61,7 +61,7 @@ class Moment:
                 physics=self.car_state["physics"], boost_amount=self.car_state["boost_amount"])
             ball_state = BallState(physics=self.ball_state["physics"])
             game_info_state = GameInfoState(self.game_info_state)
-            if self.mode is 0:
+            if self.mode == 0:
                 game_state = GameState(ball=ball_state, cars={
                     0: car_state}, game_info=game_info_state)
             else:

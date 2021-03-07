@@ -13,7 +13,7 @@ class MyBot(BaseAgent):
         super().__init__(name, team, index)
         self.recorder = None
         self.moment = None
-        self.stop_time = 30
+        self.recording_time = 0
         self.start_record = False
         self.buffer = []
         self.replay_start = False
@@ -21,7 +21,6 @@ class MyBot(BaseAgent):
         self.snap_save = False
         self.replay_check = False
         self.is_ready_to_load = False
-        self.isbotout = False
 
     def initialize_agent(self):
         self.recorder = Recorder()
@@ -33,20 +32,18 @@ class MyBot(BaseAgent):
         see the motion of the ball, etc. and return controls to drive your car.
         """
         if keyboard.is_pressed("/"):
-            self.stop_time = 30
+            self.recording_time = packet.game_info.seconds_elapsed + 30
             self.start_record = True
             self.show_text = True
 
         if self.start_record:
-            if self.stop_time == 0:
+            if packet.game_info.seconds_elapsed >= self.recording_time:
                 self.start_record = False
                 self.recorder.save()
                 self.show_text = False
             else:
-                print(self.stop_time)
                 self.recorder.store(packet)
-                self.stop_time -= 1
-                time.sleep(1)
+                time.sleep(0.1)
 
         if keyboard.is_pressed("*"):
             self.replay_start = True
@@ -58,7 +55,8 @@ class MyBot(BaseAgent):
                 self.set_game_state(self.moment.load_state())
             self.replay_start = False
 
-        recording = "Recording: {}".format(self.stop_time)
+        recording = "Recording: {}".format(
+            abs(round(packet.game_info.seconds_elapsed - self.recording_time) + 1))
         if self.show_text:
             self.debug(self.renderer, recording)
 
