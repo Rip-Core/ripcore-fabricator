@@ -1,41 +1,29 @@
 from tkinter import *
-import multiprocessing
 from rlbot.setup_manager import SetupManager
-import psutil
 import configparser
+from tkinter import ttk
+from tkinter.filedialog import askopenfilename
+import os
 
 config = configparser.ConfigParser()
 config.read("src/config.ini")
 
-
-def start_match():
-    try:
-        manager = SetupManager()
-        manager.early_start_seconds = 5
-        manager.connect_to_game()
-        manager.game_interface.load_interface(
-            wants_quick_chat=False, wants_game_messages=False, wants_ball_predictions=False)
-        manager.load_config(config_location="src/match.cfg")
-        manager.launch_early_start_bot_processes()
-        manager.start_match()
-        manager.launch_bot_processes()
-    except Exception as e:
-        print(e)
+manager = SetupManager()
 
 
 def start():
-    global proc_starter
-    proc_starter = multiprocessing.Process(target=start_match)
-    proc_starter.start()
+    manager.early_start_seconds = 5
+    manager.connect_to_game()
+    manager.game_interface.load_interface(
+        wants_quick_chat=False, wants_game_messages=False, wants_ball_predictions=False)
+    manager.load_config(config_location="src/match.cfg")
+    manager.launch_early_start_bot_processes()
+    manager.start_match()
+    manager.launch_bot_processes()
 
 
 def stop():
-    try:
-        id = proc_starter.pid
-        proc = psutil.Process(id)
-        proc.kill()
-    except Exception as e:
-        print(e)
+    manager.shut_down(kill_all_pids=True)
 
 
 def setbutton():
@@ -59,11 +47,16 @@ def setmode():
         config.write(cfg)
 
 
+def fileselect():
+    filename = askopenfilename()
+    file_button["text"] = os.path.basename(filename)
+
+
 if __name__ == "__main__":
     root = Tk()
     mode_var = IntVar()
-    mode_var.set(0)
-    root.geometry("300x310")
+    mode_var.set(config["SETTINGS"]["mode"])
+    root.geometry("320x370")
     root.title("RIP core")
     Label(root, text="RIP CORE", font=("Courier", 18)).pack()
     time_label = Label(root, text="Set Playback Time", font=("Courier"))
@@ -85,8 +78,13 @@ if __name__ == "__main__":
                 value=0, command=setmode).pack()
     Radiobutton(root, text="BALL", variable=mode_var,
                 value=1, command=setmode).pack()
-    start_button = Button(root, text="START", bg="green",
-                          fg="white", width=20, command=start).pack(side=BOTTOM)
+    ttk.Separator(root, orient="horizontal").pack(fill="x")
+    Label(root, text="Replay Viewer", font=("Courier")).pack()
+    file_button = Button(
+        root, text="Select Record", command=fileselect)
+    file_button.pack()
     stop_button = Button(root, text="STOP", bg="red",
                          fg="white", width=20, command=stop).pack(side=BOTTOM)
+    start_button = Button(root, text="START", bg="green",
+                          fg="white", width=20, command=start).pack(side=BOTTOM)
     root.mainloop()

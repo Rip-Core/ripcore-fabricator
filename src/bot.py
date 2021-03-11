@@ -1,10 +1,11 @@
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
-from rlbot.utils.game_state_util import GameState, CarState, Rotator, Physics, Vector3
+from rlbot.utils.game_state_util import BallState, GameState, CarState, Rotator, Physics, Vector3
 
 from Snapshot.snap import Recorder
 from play_moment.moment import Moment
 import keyboard
+import pickle
 import time
 
 
@@ -43,7 +44,7 @@ class MyBot(BaseAgent):
                 self.show_text = False
             else:
                 self.recorder.store(packet)
-                time.sleep(0.1)
+                # time.sleep(0.1)
 
         if keyboard.is_pressed("*"):
             self.replay_start = True
@@ -61,8 +62,6 @@ class MyBot(BaseAgent):
             self.debug(self.renderer, recording)
 
         controls = SimpleControllerState()
-        controls.throttle = 1
-
         return controls
 
     def debug(self, renderer, text):
