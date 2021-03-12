@@ -44,7 +44,7 @@ class MyBot(BaseAgent):
                 self.show_text = False
             else:
                 self.recorder.store(packet)
-                # time.sleep(0.1)
+                time.sleep(0.1)
 
         if keyboard.is_pressed("*"):
             self.replay_start = True
