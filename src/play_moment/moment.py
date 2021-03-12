@@ -49,9 +49,7 @@ class Moment:
         try:
             self.game_state = GameState.create_from_gametickpacket(
                 self.starting_state)
-            for key, value in enumerate(self.game_state.cars):
-                self.car_state[key] = value.__dict__
-            print(self.car_state)
+            self.car_state = self.game_state.cars[0].__dict__
             self.ball_state = self.game_state.ball.__dict__
             self.game_info_state = self.game_state.game_info
         except Exception as e:
@@ -59,15 +57,13 @@ class Moment:
 
     def load_state(self) -> GameState:
         try:
-            car_state = {}
-            for key, value in self.car_state.items():
-                car_state[key] = CarState(
-                    physics=value["physics"], boost_amount=value["boost_amount"])
+            car_state = CarState(
+                physics=self.car_state["physics"], boost_amount=self.car_state["boost_amount"])
             ball_state = BallState(physics=self.ball_state["physics"])
             game_info_state = GameInfoState(self.game_info_state)
             if self.mode == 0:
-                game_state = GameState(
-                    ball=ball_state, cars=car_state, game_info=game_info_state)
+                game_state = GameState(ball=ball_state, cars={
+                    0: car_state}, game_info=game_info_state)
             else:
                 game_state = GameState(
                     ball=ball_state, game_info=game_info_state)
