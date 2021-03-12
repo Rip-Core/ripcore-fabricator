@@ -16,7 +16,7 @@ class Recap:
         self.start_time = float(config["REPLAYER"]["start_time"])
 
     def replayer(self, set_game_state):
-        with open("src/Snapshot/dumper/snapshot#127.pickle", "rb") as testi:
+        with open("src/Snapshot/dumper/snapshot#3.pickle", "rb") as testi:
             packi = pickle.load(testi)
         # starting_state = GameState.create_from_gametickpacket(
         #     packi[0])
