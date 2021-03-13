@@ -62,7 +62,6 @@ class MyBot(BaseAgent):
             self.debug(self.renderer, recording)
 
         controls = SimpleControllerState()
-        controls.throttle = 1
         return controls
 
     def debug(self, renderer, text):
