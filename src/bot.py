@@ -5,7 +5,6 @@ from rlbot.utils.game_state_util import BallState, GameState, CarState, Rotator,
 from Snapshot.snap import Recorder
 from play_moment.moment import Moment
 import keyboard
-import pickle
 import time
 
 

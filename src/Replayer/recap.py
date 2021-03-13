@@ -11,9 +11,10 @@ class Recap:
         self.start_time = 0
         self.pack_start = None
         self.replay_start = 0
-        self.packi = None
+        self.packet = None
         self.index = 0
         self.load = False
+        self.num_cars = None
 
     def init(self):
         config = configparser.ConfigParser()
@@ -25,33 +26,15 @@ class Recap:
     def replayer(self, set_game_state):
         if not self.load:
             with open(f"src/Snapshot/dumper/{self.file}", "rb") as testi:
-                self.packi = pickle.load(testi)
-            self.pack_start = self.packi[0].game_info.seconds_elapsed
+                self.packet = pickle.load(testi)
+            self.num_cars = self.packet[len(self.packet) - 1].num_cars
+            self.pack_start = self.packet[0].game_info.seconds_elapsed
             self.replay_start = self.pack_start + self.start_time
-            for ind, paks in enumerate(self.packi):
+            for ind, paks in enumerate(self.packet):
                 if float("%.1f" % paks.game_info.seconds_elapsed) == float("%.1f" % self.replay_start):
                     self.index = ind
             self.load = True
-
-        starting_state = GameState.create_from_gametickpacket(
-            self.packi[self.index])
-        carsta0 = CarState(
-            physics=starting_state.cars[0].physics, boost_amount=starting_state.boosts)
-        carsta1 = CarState(
-            physics=starting_state.cars[1].physics, boost_amount=starting_state.boosts)
-        carsta2 = CarState(
-            physics=starting_state.cars[2].physics, boost_amount=starting_state.boosts)
-        carsta3 = CarState(
-            physics=starting_state.cars[3].physics, boost_amount=starting_state.boosts)
-        carsta4 = CarState(
-            physics=starting_state.cars[4].physics, boost_amount=starting_state.boosts)
-        carsta5 = CarState(
-            physics=starting_state.cars[5].physics, boost_amount=starting_state.boosts)
-        starting_gamestate = GameState(ball=starting_state.ball, cars={
-            0: carsta0, 1: carsta1, 2: carsta2, 3: carsta3, 4: carsta4, 5: carsta5})
-        set_game_state(starting_gamestate)
-
-        for pic in self.packi[self.index:]:
+        for pic in self.packet[self.index:]:
             if keyboard.is_pressed("+"):
                 break
             state = GameState.create_from_gametickpacket(pic)
