@@ -62,11 +62,17 @@ def starting_time():
         config.write(cfg)
 
 
+def record_time():
+    config["SETTINGS"]["record_time"] = record_entry.get()
+    with open("src/config.ini", "w") as cfg:
+        config.write(cfg)
+
+
 if __name__ == "__main__":
     root = Tk()
     mode_var = IntVar()
     mode_var.set(config["SETTINGS"]["mode"])
-    root.geometry("350x400")
+    root.geometry("350x500")
     root.title("RIP core")
     Label(root, text="RIP CORE", font=("Courier", 18)).pack()
 
@@ -92,7 +98,14 @@ if __name__ == "__main__":
                 value=0, command=setmode).pack()
     Radiobutton(root, text="BALL", variable=mode_var,
                 value=1, command=setmode).pack()
-
+    record_label = Label(root, text="Set Recording Time", font=("Courier"))
+    record_label.pack()
+    record_entry = Entry(root, width=30)
+    record_entry.pack()
+    record_time_set = Button(root, text="SET RECORDING TIME",
+                             command=record_time)
+    record_time_set.pack()
+    Label(root, text="\n").pack()
     ttk.Separator(root, orient="horizontal").pack(fill="x")
 
     Label(root, text="Replay Viewer", font=("Courier")).pack()

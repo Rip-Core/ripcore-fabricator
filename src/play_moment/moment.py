@@ -15,7 +15,7 @@ class Moment:
         self.game_info_state = None
         self.snap_count = 4
         self.car_index = None
-        self.set_playback_time = 10
+        self.set_playback_time = 0
         self.snap_end_time = None
         self.mode = 0
 
