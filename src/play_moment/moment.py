@@ -25,7 +25,7 @@ class Moment:
             config.read("src/config.ini")
             self.snap_count = int(config['SETTINGS']['set_custom_snap'])
             self.set_playback_time = float(config['SETTINGS']['playback_time'])
-            # self.mode = float(config["SETTINGS"]["mode"])
+            self.mode = float(config["SETTINGS"]["mode"])
         except Exception as e:
             print(e)
 
