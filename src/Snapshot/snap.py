@@ -5,10 +5,14 @@ import configparser
 
 class Recorder:
     def __init__(self):
+        self.config = None
+        self.snap_count = None
+        self.buffer = []
+
+    def init(self):
         self.config = configparser.ConfigParser()
         self.config.read("src/config.ini")
         self.snap_count = int(self.config["SETTINGS"]["snap_count"])
-        self.buffer = []
 
     def store(self, packet):
         self.buffer.append(copy.deepcopy(packet))

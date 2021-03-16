@@ -9,18 +9,24 @@ class Recap:
     def __init__(self):
         self.file = None
         self.start_time = 0
+        self.end_time = 0
         self.pack_start = None
+        self.pack_end = None
         self.replay_start = 0
+        self.replay_stop = 0
         self.packet = None
-        self.index = 0
+        self.start_index = 0
+        self.end_index = 0
         self.load = False
         self.num_cars = None
+        self.create_pack = []
 
     def init(self):
         config = configparser.ConfigParser()
         config.read("src/config.ini")
         self.file = config["REPLAYER"]["file"]
         self.start_time = float(config["REPLAYER"]["start_time"])
+        self.end_time = float(config["REPLAYER"]["end_time"])
         self.load = False
 
     def replayer(self, set_game_state):
@@ -30,11 +36,15 @@ class Recap:
             self.num_cars = self.packet[len(self.packet) - 1].num_cars
             self.pack_start = self.packet[0].game_info.seconds_elapsed
             self.replay_start = self.pack_start + self.start_time
+            self.replay_stop = self.pack_start + self.end_time
             for ind, paks in enumerate(self.packet):
                 if float("%.1f" % paks.game_info.seconds_elapsed) == float("%.1f" % self.replay_start):
-                    self.index = ind
+                    self.start_index = ind
+                if float("%.1f" % paks.game_info.seconds_elapsed) == float("%.1f" % self.replay_stop):
+                    self.end_index = ind
             self.load = True
-        for pic in self.packet[self.index:]:
+        for pic in self.packet[self.start_index:self.end_index]:
+            self.create_pack.append(pic)
             if keyboard.is_pressed("+"):
                 break
             state = GameState.create_from_gametickpacket(pic)
@@ -56,3 +66,8 @@ class Recap:
                 0: carsta0, 1: carsta1, 2: carsta2, 3: carsta3, 4: carsta4, 5: carsta5})
             set_game_state(game_state=gamesta)
             time.sleep(0.1)
+
+    def save_pack(self, name):
+        with open(f"{name}", "wb") as trapacks:
+            pickle.dump(self.create_pack, trapacks)
+        self.create_pack.clear()

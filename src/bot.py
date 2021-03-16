@@ -1,6 +1,5 @@
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
-from rlbot.utils.game_state_util import BallState, GameState, CarState, Rotator, Physics, Vector3
 
 from Snapshot.snap import Recorder
 from play_moment.moment import Moment
@@ -49,6 +48,7 @@ class MyBot(BaseAgent):
                 self.recorder.save()
                 self.show_text = False
             else:
+                self.recorder.init()
                 self.recorder.store(packet)
                 time.sleep(0.1)
 

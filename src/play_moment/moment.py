@@ -25,7 +25,7 @@ class Moment:
             config.read("src/config.ini")
             self.snap_count = int(config['SETTINGS']['set_custom_snap'])
             self.set_playback_time = float(config['SETTINGS']['playback_time'])
-            self.mode = float(config["SETTINGS"]["mode"])
+            self.mode = int(config["SETTINGS"]["mode"])
         except Exception as e:
             print(e)
 
@@ -70,9 +70,6 @@ class Moment:
             else:
                 game_state = GameState(
                     ball=ball_state, game_info=game_info_state)
-
-            # with open(f"src/Snapshot/training_pack/test#{self.snap_count}.pack", "wb") as gs:
-            #     pickle.dump(game_state, gs)
             return game_state
         except Exception as e:
             print(e)

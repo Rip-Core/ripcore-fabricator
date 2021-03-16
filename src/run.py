@@ -2,8 +2,9 @@ from tkinter import *
 from rlbot.setup_manager import SetupManager
 import configparser
 from tkinter import ttk
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 import os
+from Replayer.recap import Recap
 
 config = configparser.ConfigParser()
 config.read("src/config.ini")
@@ -62,63 +63,86 @@ def starting_time():
         config.write(cfg)
 
 
+def ending_time():
+    end_time = replay_end.get()
+    config["REPLAYER"]["end_time"] = end_time
+    with open("src/config.ini", "w") as cfg:
+        config.write(cfg)
+
+
 def record_time():
     config["SETTINGS"]["record_time"] = record_entry.get()
     with open("src/config.ini", "w") as cfg:
         config.write(cfg)
 
 
+def pack_saver():
+    ext = [("All files", "*.*"),
+           ("Training Packs", "*.pack")]
+    file = asksaveasfilename(filetypes=ext, defaultextension=".pack")
+    saver = Recap()
+    if file:
+        saver.save_pack(file)
+
+
 if __name__ == "__main__":
     root = Tk()
     mode_var = IntVar()
     mode_var.set(config["SETTINGS"]["mode"])
-    root.geometry("350x500")
+    # root.geometry("500x500")
     root.title("RIP core")
-    Label(root, text="RIP CORE", font=("Courier", 18)).pack()
-
+    title = Label(root, text="          RIP CORE", font=("Courier", 18))
+    title.grid()
     time_label = Label(root, text="Set Playback Time", font=("Courier"))
-    time_label.pack()
+    time_label.grid()
     time_entry = Entry(root, width=30)
-    time_entry.pack()
+    time_entry.grid(row=2, column=0)
     set_button = Button(root, text="SET TIME",
                         command=setbutton)
-    set_button.pack()
+    set_button.grid(row=2, column=1)
 
     count_label = Label(root, text="Set Snap", font=("Courier"))
-    count_label.pack()
-    time_label.pack()
+    count_label.grid()
     snap_entry = Entry(root, width=30)
-    snap_entry.pack()
+    snap_entry.grid(row=4, column=0)
     set_snap = Button(root, text="SET SNAP",
-                      command=setsnap).pack()
+                      command=setsnap).grid(row=4, column=1)
 
     mode_label = Label(root, text="Select Mode", font=("Courier"))
-    mode_label.pack()
+    mode_label.grid()
     Radiobutton(root, text="BOTH", variable=mode_var,
-                value=0, command=setmode).pack()
+                value=0, command=setmode).grid()
     Radiobutton(root, text="BALL", variable=mode_var,
-                value=1, command=setmode).pack()
+                value=1, command=setmode).grid()
     record_label = Label(root, text="Set Recording Time", font=("Courier"))
-    record_label.pack()
+    record_label.grid()
     record_entry = Entry(root, width=30)
-    record_entry.pack()
-    record_time_set = Button(root, text="SET RECORDING TIME",
+    record_entry.grid(row=9, column=0)
+    record_time_set = Button(root, text="SET TIME",
                              command=record_time)
-    record_time_set.pack()
-    Label(root, text="\n").pack()
-    ttk.Separator(root, orient="horizontal").pack(fill="x")
+    record_time_set.grid(row=9, column=1)
+    Label(root, text="\n").grid()
+    ttk.Separator(root, orient="horizontal").grid(
+        row=11, columnspan=3, sticky="ew")
 
-    Label(root, text="Replay Viewer", font=("Courier")).pack()
+    Label(root, text="Replay Viewer", font=("Courier")).grid()
     file_button = Button(
         root, text="Select Record", command=fileselect)
-    file_button.pack()
+    file_button.grid(row=12, column=1)
     replay_playback = Entry(root, width=30)
-    replay_playback.pack()
+    replay_playback.grid(row=13, column=0)
     playback_button = Button(
-        root, text="Set Starting Time", command=starting_time).pack()
+        root, text="Set Starting Time", command=starting_time).grid(row=13, column=1)
+    replay_end = Entry(root, width=30)
+    replay_end.grid(row=14, column=0)
+    replay_end_button = Button(
+        root, text="Set Ending Time", command=ending_time).grid(row=14, column=1)
+    save_button = Button(root, text="Create Pack",
+                         command=pack_saver).grid(row=15)
 
-    stop_button = Button(root, text="STOP", bg="red",
-                         fg="white", width=20, command=stop).pack(side=BOTTOM)
     start_button = Button(root, text="START", bg="green",
-                          fg="white", width=20, command=start).pack(side=BOTTOM)
+                          fg="white", width=10, command=start).grid(row=16, sticky="e")
+    stop_button = Button(root, text="STOP", bg="red",
+                         fg="white", width=10, command=stop).grid(row=16, column=1)
+
     root.mainloop()
