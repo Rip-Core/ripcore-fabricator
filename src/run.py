@@ -4,7 +4,6 @@ import configparser
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import os
-from Replayer.recap import Recap
 
 config = configparser.ConfigParser()
 config.read("src/config.ini")
@@ -80,16 +79,16 @@ def pack_saver():
     ext = [("All files", "*.*"),
            ("Training Packs", "*.pack")]
     file = asksaveasfilename(filetypes=ext, defaultextension=".pack")
-    saver = Recap()
     if file:
-        saver.save_pack(file)
+        config["REPLAYER"]["save_as"] = file
+        with open("src/config.ini", "w") as cfg:
+            config.write(cfg)
 
 
 if __name__ == "__main__":
     root = Tk()
     mode_var = IntVar()
     mode_var.set(config["SETTINGS"]["mode"])
-    # root.geometry("500x500")
     root.title("RIP core")
     title = Label(root, text="          RIP CORE", font=("Courier", 18))
     title.grid()

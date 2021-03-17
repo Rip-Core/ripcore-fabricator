@@ -44,10 +44,10 @@ class Recap:
                     self.end_index = ind
             self.load = True
         for pic in self.packet[self.start_index:self.end_index]:
-            self.create_pack.append(pic)
             if keyboard.is_pressed("+"):
                 break
             state = GameState.create_from_gametickpacket(pic)
+            self.create_pack.append(state)
             carsta0 = CarState(
                 physics=state.cars[0].physics)
             carsta1 = CarState(
@@ -71,3 +71,8 @@ class Recap:
         with open(f"{name}", "wb") as trapacks:
             pickle.dump(self.create_pack, trapacks)
         self.create_pack.clear()
+        config = configparser.ConfigParser()
+        config.read("src/config.ini")
+        config["REPLAYER"]["save_as"] = ""
+        with open("src/config.ini", "w") as cfg:
+            config.write(cfg)
