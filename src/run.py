@@ -1,12 +1,9 @@
 from tkinter import *
 from rlbot.setup_manager import SetupManager
-import configparser
+from configparser import ConfigParser
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import os
-
-config = configparser.ConfigParser()
-config.read("src/config.ini")
 
 manager = SetupManager()
 
@@ -27,6 +24,8 @@ def stop():
 
 
 def setbutton():
+    config = ConfigParser()
+    config.read("src/config.ini")
     playback_time = time_entry.get()
     config["SETTINGS"]["playback_time"] = playback_time
     with open("src/config.ini", "w") as pp:
@@ -34,6 +33,8 @@ def setbutton():
 
 
 def setsnap():
+    config = ConfigParser()
+    config.read("src/config.ini")
     snap_set = snap_entry.get()
     config["SETTINGS"]["set_custom_snap"] = snap_set
     with open("src/config.ini", "w") as cfg:
@@ -41,6 +42,8 @@ def setsnap():
 
 
 def setmode():
+    config = ConfigParser()
+    config.read("src/config.ini")
     mode_set = str(mode_var.get())
     config["SETTINGS"]["mode"] = mode_set
     with open("src/config.ini", "w") as cfg:
@@ -48,6 +51,8 @@ def setmode():
 
 
 def fileselect():
+    config = ConfigParser()
+    config.read("src/config.ini")
     filename = askopenfilename()
     file_button["text"] = os.path.basename(filename)
     config["REPLAYER"]["file"] = os.path.basename(filename)
@@ -56,6 +61,8 @@ def fileselect():
 
 
 def starting_time():
+    config = ConfigParser()
+    config.read("src/config.ini")
     start_time = replay_playback.get()
     config["REPLAYER"]["start_time"] = start_time
     with open("src/config.ini", "w") as cfg:
@@ -63,6 +70,8 @@ def starting_time():
 
 
 def ending_time():
+    config = ConfigParser()
+    config.read("src/config.ini")
     end_time = replay_end.get()
     config["REPLAYER"]["end_time"] = end_time
     with open("src/config.ini", "w") as cfg:
@@ -70,12 +79,16 @@ def ending_time():
 
 
 def record_time():
+    config = ConfigParser()
+    config.read("src/config.ini")
     config["SETTINGS"]["record_time"] = record_entry.get()
     with open("src/config.ini", "w") as cfg:
         config.write(cfg)
 
 
 def pack_saver():
+    config = ConfigParser()
+    config.read("src/config.ini")
     ext = [("All files", "*.*"),
            ("Training Packs", "*.pack")]
     file = asksaveasfilename(filetypes=ext, defaultextension=".pack")
@@ -86,6 +99,8 @@ def pack_saver():
 
 
 if __name__ == "__main__":
+    config = ConfigParser()
+    config.read("src/config.ini")
     root = Tk()
     mode_var = IntVar()
     mode_var.set(config["SETTINGS"]["mode"])

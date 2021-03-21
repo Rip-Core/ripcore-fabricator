@@ -22,7 +22,6 @@ class MyBot(BaseAgent):
         self.replay_check = False
         self.is_ready_to_load = False
         self.custom_record_time = 30
-        self.config = configparser.ConfigParser()
 
     def initialize_agent(self):
         self.recorder = Recorder()
@@ -34,9 +33,10 @@ class MyBot(BaseAgent):
         see the motion of the ball, etc. and return controls to drive your car.
         """
         if keyboard.is_pressed("/"):
-            self.config.read("src/config.ini")
+            config = configparser.ConfigParser()
+            config.read("src/config.ini")
             self.custom_record_time = int(
-                self.config["SETTINGS"]["record_time"])
+                config["SETTINGS"]["record_time"])
             print(self.custom_record_time)
             self.recording_time = packet.game_info.seconds_elapsed + self.custom_record_time
             self.start_record = True
@@ -48,7 +48,6 @@ class MyBot(BaseAgent):
                 self.recorder.save()
                 self.show_text = False
             else:
-                self.recorder.init()
                 self.recorder.store(packet)
                 time.sleep(0.1)
 
