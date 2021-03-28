@@ -6,8 +6,6 @@ __pycache__/
 # C extensions
 *.so
 
-dump.txt
-
 # Distribution / packaging
 .Python
 env/
@@ -85,6 +83,7 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+env/
 
 # Spyder project settings
 .spyderproject
