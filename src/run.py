@@ -48,7 +48,29 @@ def setmode():
     config["SETTINGS"]["mode"] = mode_set
     with open("src/config.ini", "w") as cfg:
         config.write(cfg)
-
+    
+def setteams():
+    config = ConfigParser()
+    config.read("src/match.cfg")
+    team_set = str(team_var.get())
+    
+    if team_set == "0":
+        config["Match Configuration"]["num_participants"] = "2"
+        config["Participant Configuration"]["participant_team_1"] = "1"
+    elif team_set == "1":
+        config["Match Configuration"]["num_participants"] = "4"
+        config["Participant Configuration"]["participant_team_1"] = "0"
+        config["Participant Configuration"]["participant_team_2"] = "1"
+        config["Participant Configuration"]["participant_team_3"] = "1"
+    elif team_set == "2":
+        config["Match Configuration"]["num_participants"] = "6"
+        config["Participant Configuration"]["participant_team_1"] = "0"
+        config["Participant Configuration"]["participant_team_2"] = "0"
+        config["Participant Configuration"]["participant_team_3"] = "1"       
+        config["Participant Configuration"]["participant_team_4"] = "1"
+        config["Participant Configuration"]["participant_team_5"] = "1"  
+    with open("src/match.cfg", "w") as cfg:
+            config.write(cfg)
 
 def fileselect():
     config = ConfigParser()
@@ -101,9 +123,13 @@ def pack_saver():
 if __name__ == "__main__":
     config = ConfigParser()
     config.read("src/config.ini")
+    teamconfig = ConfigParser()
+    teamconfig.read("src/match.cfg")
     root = Tk()
     mode_var = IntVar()
     mode_var.set(config["SETTINGS"]["mode"])
+    team_var = IntVar()
+    team_var.set(teamconfig["Match Configuration"]["num_participants"])
     root.title("RIP core")
     title = Label(root, text="          RIP CORE", font=("Courier", 18))
     title.grid()
@@ -123,18 +149,26 @@ if __name__ == "__main__":
                       command=setsnap).grid(row=4, column=1)
 
     mode_label = Label(root, text="Select Mode", font=("Courier"))
-    mode_label.grid()
+    mode_label.grid(row=6, column = 0)
     Radiobutton(root, text="BOTH", variable=mode_var,
                 value=0, command=setmode).grid()
     Radiobutton(root, text="BALL", variable=mode_var,
                 value=1, command=setmode).grid()
+    teams_label = Label(root, text= "Select Team Size", font=("Courier"))
+    teams_label.grid(row=6, column = 1)
+    Radiobutton(root, text="1v1", variable=team_var, 
+                value = 0, command=setteams).grid(row = 7, column = 1)
+    Radiobutton(root, text="2v2", variable=team_var, 
+                value = 1, command=setteams).grid(row = 8, column =1)
+    Radiobutton(root, text="3v3", variable=team_var, 
+                value = 2, command=setteams).grid(row = 9, column = 1)        
     record_label = Label(root, text="Set Recording Time", font=("Courier"))
     record_label.grid()
     record_entry = Entry(root, width=30)
-    record_entry.grid(row=9, column=0)
+    record_entry.grid(row=10, column=0)
     record_time_set = Button(root, text="SET TIME",
                              command=record_time)
-    record_time_set.grid(row=9, column=1)
+    record_time_set.grid(row=10, column=1)
     Label(root, text="\n").grid()
     ttk.Separator(root, orient="horizontal").grid(
         row=11, columnspan=3, sticky="ew")
@@ -142,21 +176,21 @@ if __name__ == "__main__":
     Label(root, text="Replay Viewer", font=("Courier")).grid()
     file_button = Button(
         root, text="Select Record", command=fileselect)
-    file_button.grid(row=12, column=1)
+    file_button.grid(row=13, column=1)
     replay_playback = Entry(root, width=30)
-    replay_playback.grid(row=13, column=0)
+    replay_playback.grid(row=14, column=0)
     playback_button = Button(
-        root, text="Set Starting Time", command=starting_time).grid(row=13, column=1)
+        root, text="Set Starting Time", command=starting_time).grid(row=14, column=1)
     replay_end = Entry(root, width=30)
-    replay_end.grid(row=14, column=0)
+    replay_end.grid(row=15, column=0)
     replay_end_button = Button(
-        root, text="Set Ending Time", command=ending_time).grid(row=14, column=1)
+        root, text="Set Ending Time", command=ending_time).grid(row=15, column=1)
     save_button = Button(root, text="Create Pack",
-                         command=pack_saver).grid(row=15)
+                         command=pack_saver).grid(row=17)
 
     start_button = Button(root, text="START", bg="green",
-                          fg="white", width=10, command=start).grid(row=16, sticky="e")
+                          fg="white", width=10, command=start).grid(row=17, sticky="e")
     stop_button = Button(root, text="STOP", bg="red",
-                         fg="white", width=10, command=stop).grid(row=16, column=1)
+                         fg="white", width=10, command=stop).grid(row=17, column=1)
 
     root.mainloop()
